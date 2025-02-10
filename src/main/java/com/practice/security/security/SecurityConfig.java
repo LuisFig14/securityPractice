@@ -2,8 +2,10 @@ package com.practice.security.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,47 +19,47 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)throws Exception {
-
-        http
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(csrf->csrf.disable())
                 .authorizeHttpRequests(auth-> auth
-                        .requestMatchers("/").permitAll() //public access
-                        .requestMatchers("/user").hasRole("USER") //
-                        .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/public/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
+                .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(Customizer.withDefaults())
+                .formLogin(login->login.disable())
 
-                .formLogin(form-> form
-                        .loginPage("/login")
-                        .permitAll()
-                )
-                .logout(logout -> logout.permitAll());
-
-        return http.build();
-
+                .build();
     }
 
     @Bean
-    public UserDetailsService userDetailsService(){
+    public UserDetailsService userDetailsService() {
 
-        UserDetails user = User.withUsername("user")
-                .password(passwordEncoder().encode("password"))
+        UserDetails user =User.withDefaultPasswordEncoder()
+                .username("user")
+                .password("1234")
                 .roles("USER")
                 .build();
 
-        UserDetails admin = User.withUsername("admin")
-                .password(passwordEncoder().encode("admin"))
+
+        UserDetails admin =User.withDefaultPasswordEncoder()
+                .username("admin")
+                .password("admin1234")
                 .roles("ADMIN")
                 .build();
 
-
         return new InMemoryUserDetailsManager(user, admin);
+
     }
 
+    /*
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Codificador de contraseñas
+    }*/
 
 
 
