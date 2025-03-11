@@ -30,7 +30,7 @@ public class AuthController {
 
         UserEntity user = new UserEntity();
         user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setRole(userDto.getRole());
 
         userRepository.save(user);

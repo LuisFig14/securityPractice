@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping
 public class TestController {
 
-    @GetMapping("/public/hello")
+    @GetMapping("/public")
     public String home (){
         return "¡Welcome to the public route!";
     }
 
-    @GetMapping("/user/hello")
+    @GetMapping("/user")
     public String user(){
         return "¡Hello user!";
     }
 
-    @GetMapping("/admin/hello")
+    @GetMapping("/admin")
     public String admin(){
         return "¡Hello admin!";
     }
